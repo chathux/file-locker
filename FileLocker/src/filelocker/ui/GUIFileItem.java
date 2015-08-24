@@ -174,12 +174,12 @@ public class GUIFileItem extends javax.swing.JPanel {
     private void rccMenuItemDecryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rccMenuItemDecryptActionPerformed
         // TODO add your handling code here:
         
-        fileOperationListener.selectedFilesDecryptOperationRequested();
+        fileOperationListener.fileEncryptOrDecryptOperationRequested(FileOperationListener.FileEncryptOrDecryptOperation.DecryptOperation);
     }//GEN-LAST:event_rccMenuItemDecryptActionPerformed
 
     private void rccMenuItemEncryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rccMenuItemEncryptActionPerformed
         // TODO add your handling code here:
-        fileOperationListener.selectedFilesEncryptOperationRequested();        
+        fileOperationListener.fileEncryptOrDecryptOperationRequested(FileOperationListener.FileEncryptOrDecryptOperation.EncryptOperation);
     }//GEN-LAST:event_rccMenuItemEncryptActionPerformed
 
 

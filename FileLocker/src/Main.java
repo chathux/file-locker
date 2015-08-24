@@ -3,7 +3,6 @@ import filelocker.crypto.EncryptedFileTunnel;
 import filelocker.crypto.FileCipher;
 import filelocker.ui.FileLockerMainWindow;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -40,8 +39,8 @@ public class Main {
         FileLockerMainWindow fe = new FileLockerMainWindow();
         fe.setVisible(true);
         
-/*        
-
+    
+/*
         File fIn = new File("E:/ssllab.aes");
         File fOut = new File("E:/ssllab_2.jpg");
         FileCipher cipher = FileCipher.getDecryptionCipher("chathu");
@@ -51,7 +50,8 @@ public class Main {
        
 
         System.out.println(fTunnel.doConvertion());
-*/
+        */
+
     }
 
 }

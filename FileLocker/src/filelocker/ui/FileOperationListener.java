@@ -14,9 +14,13 @@ import java.io.File;
  */
 public interface FileOperationListener {
     
+    public enum FileEncryptOrDecryptOperation{
+        EncryptOperation, DecryptOperation
+    }
+    
     public void fileOpenOperationRequested(GUIFileItem file);
     public void clearFileSelectionOperationRequested();
 
-    public void selectedFilesEncryptOperationRequested();        
-    public void selectedFilesDecryptOperationRequested();    
+    public void fileEncryptOrDecryptOperationRequested(FileEncryptOrDecryptOperation operation);        
+    
 }

@@ -16,20 +16,30 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
 /**
+ * This class creates a tunnel between two files by encrypting
+ * content of one file and writing to the other.
  *
  * @author i3-chathu-L
  */
 public class EncryptedFileTunnel{
-    private File fileIn;
-    private File fileOut;
-    private FileOutputStream fOutputStream;
-    private FileInputStream fInputStream;
+    private final File fileIn;
+    private final File fileOut;
+    private final FileOutputStream fOutputStream;
+    private final FileInputStream fInputStream;
         
-    private FileCipher fileCipher;
+    private final FileCipher fileCipher;
     
-    
+    /**
+     *
+     * @param fileIn File to be encrypted
+     * @param fileOut File to write the encrypted contents 
+     * @param cipher {@link filelocker.crypto.FileCipher} object denoting the encrypt or decrypt operation 
+     * @throws FileNotFoundException
+     * 
+     */
     public EncryptedFileTunnel(File fileIn, File fileOut, FileCipher cipher) throws FileNotFoundException{
         this.fileIn = fileIn;
+        this.fileOut = fileOut;
         this.fileCipher = cipher;
         
         this.fInputStream = new FileInputStream(fileIn);

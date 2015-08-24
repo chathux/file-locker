@@ -24,9 +24,7 @@ import javax.swing.SwingUtilities;
  */
 public class FileLockerMainWindow extends javax.swing.JFrame implements FileOperationListener{
 
-    /**
-     * Creates new form FileExplorer
-     */
+
     
     private FileUtils fileUtils;
     private ArrayList<GUIFileItem> fileExplorerCurrentFiles;
@@ -48,6 +46,10 @@ public class FileLockerMainWindow extends javax.swing.JFrame implements FileOper
     }
 
     
+    /**
+     * Updates the current file explorer view with given files
+     * @param files array of Files need to be displayed
+     */
     private void updateFileExplorerView(File[] files){
         
         pnlFileExplorer.removeAll();
@@ -70,8 +72,7 @@ public class FileLockerMainWindow extends javax.swing.JFrame implements FileOper
         txtFileExplorerAddress.setText(fileExplorerCurrentDirectory.getAbsolutePath());
     }
 
-
-
+    
     @Override
     public void fileOpenOperationRequested(GUIFileItem file) {
         fileExplorerCurrentDirectory = file.getFile();
@@ -88,98 +89,24 @@ public class FileLockerMainWindow extends javax.swing.JFrame implements FileOper
         }
     }
     
+    
     @Override
-    public void selectedFilesEncryptOperationRequested() {
+    public void fileEncryptOrDecryptOperationRequested(FileEncryptOrDecryptOperation operation){
         
-        final ArrayList<File> encFiles = new ArrayList<>();
+        //get selected files in file explorer view
+        ArrayList<File> selectedFiles = new ArrayList<>();
         for(GUIFileItem guiFile : fileExplorerCurrentFiles){
             if(guiFile.isFileSelected()){
-                encFiles.add(guiFile.getFile());            
+                selectedFiles.add(guiFile.getFile());            
             }
         }
-        if(encFiles.size() < 1){
-            System.out.println("No Files were selected");            
-            return;
-        }
         
-       
-        final String password = PasswordInputDialog.showPasswordDialog(this);
-        
-        if(password == null ){
-            return;
-        }
-        
-        
-
-        final FileOperationProgressDialog operationDialog = new FileOperationProgressDialog(this, true);        
-        
-        new Thread(){
-            public void run(){
-                
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                       operationDialog.setVisible(true);
-                    }
-                });
-                
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(FileLockerMainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                System.out.println("Password" + password);                
-                FileCipher cipher = FileCipher.getEncryptionCipher(password);
-                cipher.initFileCiper();
-                for(File encFile : encFiles){                        
-                    File encOutFile = new File(encFile.getAbsolutePath() + ".enc");   ;
-
-                    System.out.println(encOutFile.getAbsolutePath());
-                    
-                    try {
-                        EncryptedFileTunnel  fTunnel = new EncryptedFileTunnel(encFile, encOutFile, cipher);
-                        fTunnel.doConvertion();
-                    } catch (Exception ex) {
-                        Logger.getLogger(FileLockerMainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                }
-                
-                while(!operationDialog.isVisible()){
-                    try {
-                        sleep(10);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileLockerMainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                operationDialog.setVisible(false);
-                
-            }
-        }.start();
-
-       
-        
-        
-    }
-
-    @Override
-    public void selectedFilesDecryptOperationRequested() {
-     final ArrayList<File> decFiles = new ArrayList<>();
-        for(GUIFileItem guiFile : fileExplorerCurrentFiles){
-            if(guiFile.isFileSelected()){
-                decFiles.add(guiFile.getFile());         
-            }
-        }
-        if(decFiles.size() < 1){
+        if(selectedFiles.size() < 1){
             System.out.println("No Files were selected");
             return;
         }
         
-       
-        final String password = PasswordInputDialog.showPasswordDialog(this);
-        
+        final String password = PasswordInputDialog.showPasswordDialog(this);        
         if(password == null ){
             return;
         }
@@ -189,7 +116,6 @@ public class FileLockerMainWindow extends javax.swing.JFrame implements FileOper
             public void run(){
                 
                 SwingUtilities.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                        operationDialog.setVisible(true);
@@ -203,40 +129,47 @@ public class FileLockerMainWindow extends javax.swing.JFrame implements FileOper
                 }
                 
                 System.out.println("Password" + password);
-                FileCipher cipher = FileCipher.getDecryptionCipher(password);
+                FileCipher cipher = null;
+                
+                if(operation == FileEncryptOrDecryptOperation.EncryptOperation) {
+                    cipher = FileCipher.getEncryptionCipher(password);
+                }else if(operation == FileEncryptOrDecryptOperation.DecryptOperation){
+                    cipher = FileCipher.getDecryptionCipher(password);                    
+                }
+
                 cipher.initFileCiper();
                 
-                for(File decFile : decFiles){
+                for(File f : selectedFiles){
                         
-                    File decOutFile = new File(decFile.getAbsolutePath().replaceFirst(".enc$",""));
-                    System.out.println(decOutFile.getAbsolutePath());                                       
+                    File outputFile = null;
+                    
+                    if(operation == FileEncryptOrDecryptOperation.EncryptOperation){
+                       outputFile = new File(f.getAbsolutePath() + ".enc");   ;                        
+                    }else if(operation == FileEncryptOrDecryptOperation.DecryptOperation){
+                       outputFile = new File(f.getAbsolutePath().replaceFirst(".enc$",""));                        
+                    }
 
+                    System.out.println(f.getAbsolutePath());                                       
+                    
                     try {
-                        EncryptedFileTunnel  fTunnel = new EncryptedFileTunnel(decFile, decOutFile, cipher);
+                        EncryptedFileTunnel  fTunnel = new EncryptedFileTunnel(f, outputFile, cipher);
                         fTunnel.doConvertion();
                     } catch (Exception ex) {
                         Logger.getLogger(FileLockerMainWindow.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     
+                    
                 }
                 
-                while(!operationDialog.isVisible()){
-                    try {
-                        sleep(10);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileLockerMainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
                 operationDialog.setVisible(false);
                 
+                //finally update the file explorer view to see the changes
+                updateFileExplorerView(fileUtils.getFilesAndFolders(fileExplorerCurrentDirectory));
             }
         }.start();
-
         
-       
-       
-           
     }
+
     
     /**
      * This method is called from within the constructor to initialize the form.
